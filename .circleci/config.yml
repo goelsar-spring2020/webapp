@@ -6,7 +6,7 @@ jobs:
       - image: circleci/mysql:8.0.18
         environment: 
           MYSQL_ROOT_PASSWORD: Sarthak@89 
-          MYSQL_DATABSE: db
+          MYSQL_DATABASE: db
     steps:
       - checkout # check out source code to working directory
       # - run:
