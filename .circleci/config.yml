@@ -9,7 +9,7 @@ jobs:
           MYSQL_DATABSE: db
     steps:
       - checkout # check out source code to working directory
-      -run:
+      - run:
         name: Go to directory
         command: cd cloudwebapp/
       - run:
