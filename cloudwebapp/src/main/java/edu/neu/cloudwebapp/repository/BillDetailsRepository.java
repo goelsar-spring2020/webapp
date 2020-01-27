@@ -13,7 +13,4 @@ public interface BillDetailsRepository extends CrudRepository<BillDetails, Strin
 
     @Query("Select bills from BillDetails bills where bills.id=?1")
     public BillDetails findBillDetailsById(String id);
-
-    @Query("delete FROM BillDetails bills where bills.id=?1")
-    public BillDetails deleteBillDetailsById(String Id);
 }

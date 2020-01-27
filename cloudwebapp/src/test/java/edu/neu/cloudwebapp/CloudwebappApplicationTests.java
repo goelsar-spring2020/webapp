@@ -9,9 +9,10 @@ import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.services.BillWebService;
 import edu.neu.cloudwebapp.services.UserWebService;
 import org.json.JSONException;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,8 +21,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -81,13 +86,13 @@ class CloudwebappApplicationTests {
         assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
-//	@Test(expected = NullPointerException.class)
-//	public void BlankTokenRequest() throws JSONException {
-//		UserRegistration user = new UserRegistration();
-//		user.setEmail("goelsarthak100@yahoo.com");
-//		user.setPassword("Sarthak@89");
-//		userController.getUserDetails("");
-//	}
+	@Test
+	public void BlankTokenRequest() throws JSONException {
+        Throwable thrown = assertThrows(NullPointerException.class, () -> userController.getUserDetails(""));
+	    UserRegistration user = new UserRegistration();
+		user.setEmail("goelsarthak100@yahoo.com");
+		user.setPassword("Sarthak@89");
+	}
 
     @Test
     public void findUserByEmail() throws Exception {
@@ -113,5 +118,13 @@ class CloudwebappApplicationTests {
         BillDetails bd = new BillDetails();
         ResponseEntity<String> responseEntity = billController.addBillDetails(auth, bd);
         assertEquals(responseEntity.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void updateBill() throws JSONException {
+        BillDetails bd = new BillDetails();
+        String auth = "Basic Z29lbHNhcnRoYWs5M0BnbWFpbC5jb206U2FydGhha0A4OQ==";
+        String billID = java.util.UUID.randomUUID().toString();
+        Throwable thrown = assertThrows(NullPointerException.class, () -> billController.updateBillByID(bd, billID, auth));
     }
 }

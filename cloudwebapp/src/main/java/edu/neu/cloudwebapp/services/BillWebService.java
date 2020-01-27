@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.BadRequestException;
 import java.util.Date;
 
 @Service
@@ -73,7 +72,7 @@ public class BillWebService {
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
         if (billDetails != null) {
             if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getUserID())) {
-                billDetailsRepository.deleteBillDetailsById(billId);
+                billDetailsRepository.deleteById(billId);
                 return true;
             } else {
                 throw new ResponseStatusException(
