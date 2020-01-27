@@ -3,7 +3,9 @@ package edu.neu.cloudwebapp.repository;
 import edu.neu.cloudwebapp.model.UserRegistration;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface UserRegistrationRepository extends CrudRepository<UserRegistration, Long> {
 
     @Query("Select user from UserRegistration user where user.email=?1 and user.password=?2")
