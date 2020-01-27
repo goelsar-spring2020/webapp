@@ -20,7 +20,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-//@JsonIgnoreProperties(value = { "password" })
 public class UserRegistration {
 
     @Id
