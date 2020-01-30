@@ -46,10 +46,10 @@ jobs:
             echo Failed waiting for MySQL && exit 1
       - run:
           name: Maven build
-          command: mvn compile
+          command: cd cloudwebapp/ && mvn compile
       - run:
           name: Maven test
-          command: mvn test
+          command: cd cloudwebapp/ && mvn test
 
 workflows:
   version: 2
