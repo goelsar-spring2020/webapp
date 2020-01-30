@@ -76,7 +76,7 @@ public class BillWebService {
         Iterable<BillDetails> bd = billDetailsRepository.findAll();
         List<JSONObject> listEntity = new ArrayList<>();
         for (BillDetails b : bd) {
-            if(b.getOwner_id().equalsIgnoreCase(user.getId())){
+            if (b.getOwner_id().equalsIgnoreCase(user.getId())) {
                 listEntity.add(utilityClass.getBillDetailJSON(b));
             }
         }
