@@ -32,12 +32,13 @@ public class BillDetails {
     @Column(nullable = false)
     private Date due_date;
     @DecimalMin("0.1")
-    @Column(nullable = false, precision=10, scale=2, columnDefinition="Decimal(10,2)")
+    @Column(nullable = false, precision = 10, scale = 2, columnDefinition = "Decimal(10,2)")
     private Double amount_due;
     @Column(nullable = false)
-    private String paymentStatus;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
     @ElementCollection
-    @CollectionTable(name="categories", joinColumns=@JoinColumn(name="id"))
-    @Column(name="categories")
+    @CollectionTable(name = "categories", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "categories")
     private List<String> categories = new ArrayList<>();
 }
