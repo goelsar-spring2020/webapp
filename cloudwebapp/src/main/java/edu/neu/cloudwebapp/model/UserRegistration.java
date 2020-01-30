@@ -24,7 +24,7 @@ public class UserRegistration {
 
     @Id
     @Column(nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
-    private String userID;
+    private String id;
     @Email(message = "Email should be valid")
     private String email;
     @NotNull(message = "First Name Can not be empty")

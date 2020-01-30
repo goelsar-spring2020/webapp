@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
@@ -20,7 +21,7 @@ public class UtilityClass {
             String basicAuthEncoded = authorization.substring(6);
             String basicAuthAsString = new String(Base64.getDecoder().decode(basicAuthEncoded.getBytes()));
             return basicAuthAsString;
-        } else{
+        } else {
             throw new NullPointerException("Authorization value Null");
         }
     }
@@ -46,7 +47,7 @@ public class UtilityClass {
         if (bill.getCategories() == null || bill.getCategories().size() <= 0) {
             return "Categories details are required and can not be left empty";
         }
-        if (bill.getPaymentStatus() == null || bill.getPaymentStatus().isEmpty()) {
+        if (bill.getPaymentStatus() == null) {
             return "Payment Status details are required and can not be left empty";
         }
         if (bill.getBill_date() == null) {
@@ -54,9 +55,6 @@ public class UtilityClass {
         }
         if (bill.getDue_date() == null) {
             return "Due Date can not be left empty";
-        }
-        if (!contains(bill.getPaymentStatus())) {
-            return "Payment Status Not exist in the enum value";
         }
         if (bill.getId() != null || bill.getCreated_ts() != null || bill.getUpdated_ts() != null || bill.getOwner_id() != null) {
             return "INVALID REQUEST : READ ONLY FIELDS NOT ALLOWED IN THE REQUEST";
@@ -79,6 +77,9 @@ public class UtilityClass {
         }
         if (!isPasswordValid(userRegistration.getPassword())) {
             return "Password doesn't adhere to NIST standards";
+        }
+        if (userRegistration.getId() != null || userRegistration.getAccount_created() != null || userRegistration.getAccount_updated() != null) {
+            return "Invalid HttpRequest readOnly fields not allowed";
         }
         return "Success";
     }
@@ -111,12 +112,22 @@ public class UtilityClass {
     //Method to return the JSON Object that contains all the user details except the password
     public JSONObject getUserRegistrationJSON(UserRegistration usr) throws JSONException {
         JSONObject entity = new JSONObject();
-        entity.put("id", usr.getUserID());
+        entity.put("id", usr.getId());
         entity.put("first_name", usr.getFirstName());
         entity.put("last_name", usr.getLastName());
         entity.put("email_address", usr.getEmail());
         entity.put("account_created", usr.getAccount_created());
         entity.put("account_updated", usr.getAccount_updated());
         return entity;
+    }
+
+    public String getCSVColumnValue(List<String> categories) {
+        StringBuilder result = new StringBuilder();
+        for (String category : categories) {
+            result.append(category);
+            result.append(",");
+        }
+        String res = result.toString().substring(0, result.length() - 1);
+        return res;
     }
 }

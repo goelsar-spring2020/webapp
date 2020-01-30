@@ -9,10 +9,8 @@ import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.services.BillWebService;
 import edu.neu.cloudwebapp.services.UserWebService;
 import org.json.JSONException;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -21,9 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.HttpClientErrorException;
-
-import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,21 +50,21 @@ class CloudwebappApplicationTests {
     void contextLoads() {
     }
 
-	@BeforeEach
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
 
-		UserRegistration user = new UserRegistration();
-		user.setEmail("goelsarthak100@yahoo.com");
-		user.setPassword("Sarthak@89");
-		user.setUserID("bf726389-99e4-4583-81db-d02b7da8dcb5");
-		when(userRegistrationRepository.findUserRegistrationByEmail(user.getEmail())).thenReturn(user);
-		when(userRegistrationRepository.findUserRegistrationByEmailAndPassword(user.getEmail(), user.getPassword())).thenReturn(user);
+        UserRegistration user = new UserRegistration();
+        user.setEmail("goelsarthak100@yahoo.com");
+        user.setPassword("Sarthak@89");
+        user.setId("bf726389-99e4-4583-81db-d02b7da8dcb5");
+        when(userRegistrationRepository.findUserRegistrationByEmail(user.getEmail())).thenReturn(user);
+        when(userRegistrationRepository.findUserRegistrationByEmailAndPassword(user.getEmail(), user.getPassword())).thenReturn(user);
 
-		BillDetails bd = new BillDetails();
-		bd.setId("bf726389-99e4-4583-81db-d02b7da8dcb5");
-		when(billDetailsRepository.findBillDetailsById(bd.getId())).thenReturn(bd);
-	}
+        BillDetails bd = new BillDetails();
+        bd.setId("bf726389-99e4-4583-81db-d02b7da8dcb5");
+        when(billDetailsRepository.findBillDetailsById(bd.getId())).thenReturn(bd);
+    }
 
     @Test
     public void BlankPostRequest() throws JSONException {
@@ -86,13 +81,13 @@ class CloudwebappApplicationTests {
         assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
-	@Test
-	public void BlankTokenRequest() throws JSONException {
+    @Test
+    public void BlankTokenRequest() throws JSONException {
         Throwable thrown = assertThrows(NullPointerException.class, () -> userController.getUserDetails(""));
-	    UserRegistration user = new UserRegistration();
-		user.setEmail("goelsarthak100@yahoo.com");
-		user.setPassword("Sarthak@89");
-	}
+        UserRegistration user = new UserRegistration();
+        user.setEmail("goelsarthak100@yahoo.com");
+        user.setPassword("Sarthak@89");
+    }
 
     @Test
     public void findUserByEmail() throws Exception {

@@ -31,7 +31,7 @@ public class BillWebService {
             if (message.contains("Success")) {
                 bill.setId(java.util.UUID.randomUUID().toString());
                 UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(userEmail);
-                bill.setOwner_id(user.getUserID());
+                bill.setOwner_id(user.getId());
                 bill.setCreated_ts(new Date());
                 bill.setUpdated_ts(new Date());
                 bill.setVendor(bill.getVendor());
@@ -55,7 +55,7 @@ public class BillWebService {
         BillDetails billDetails = billDetailsRepository.findBillDetailsById(billId);
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
         if (billDetails != null) {
-            if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getUserID())) {
+            if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getId())) {
                 return billDetails;
             } else {
                 throw new ResponseStatusException(
@@ -71,7 +71,7 @@ public class BillWebService {
         BillDetails billDetails = billDetailsRepository.findBillDetailsById(billId);
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
         if (billDetails != null) {
-            if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getUserID())) {
+            if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getId())) {
                 billDetailsRepository.deleteById(billId);
                 return true;
             } else {
@@ -90,7 +90,7 @@ public class BillWebService {
             UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
             BillDetails bill = billDetailsRepository.findBillDetailsById(billID);
             if (bill != null) {
-                if (bill.getOwner_id().equalsIgnoreCase(user.getUserID())) {
+                if (bill.getOwner_id().equalsIgnoreCase(user.getId())) {
                     bill.setVendor(billDetails.getVendor());
                     bill.setBill_date(billDetails.getBill_date());
                     bill.setDue_date(billDetails.getDue_date());

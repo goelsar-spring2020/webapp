@@ -52,7 +52,7 @@ public class UserWebService {
             if (isEmailPresent(ur.getEmail())) {
                 return "Email already exists in records. Please login ";
             } else {
-                ur.setUserID(java.util.UUID.randomUUID().toString());
+                ur.setId(java.util.UUID.randomUUID().toString());
                 ur.setAccount_created(new Date());
                 ur.setAccount_updated(new Date());
                 ur.setPassword(passwordEncoder.encode(ur.getPassword()));

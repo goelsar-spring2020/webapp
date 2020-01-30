@@ -1,10 +1,10 @@
 package edu.neu.cloudwebapp.model;
 
 public enum PaymentStatus {
-    PAID("paid"),
-    DUE("due"),
-    PAST_DUE("past_due"),
-    NO_PAYMENT_REQUIRED("no_payment_required");
+    paid("paid"),
+    due("due"),
+    past_due("past_due"),
+    no_payment_required("no_payment_required");
 
     private final String status;
 
