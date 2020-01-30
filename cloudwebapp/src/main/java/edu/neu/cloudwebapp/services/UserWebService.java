@@ -1,7 +1,7 @@
 package edu.neu.cloudwebapp.services;
 
-import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.model.UserRegistration;
+import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
