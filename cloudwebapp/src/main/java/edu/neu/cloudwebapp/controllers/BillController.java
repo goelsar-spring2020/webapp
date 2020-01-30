@@ -56,11 +56,7 @@ public class BillController {
             String[] headerAuth = authorization.split(":");
             String email = headerAuth[0];
             String password = headerAuth[1];
-            Iterable<BillDetails> bd = billDetailsRepository.findAll();
-            List<JSONObject> listEntity = new ArrayList<>();
-            for (BillDetails b : bd) {
-                listEntity.add(utilityClass.getBillDetailJSON(b));
-            }
+            List<JSONObject> listEntity = billWebService.getUserBillDetails(email);
             if (listEntity.size() > 0)
                 return new ResponseEntity<String>(listEntity.toString(), HttpStatus.OK);
         } catch (

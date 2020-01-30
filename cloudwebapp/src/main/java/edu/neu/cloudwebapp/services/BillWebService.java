@@ -5,12 +5,16 @@ import edu.neu.cloudwebapp.model.UserRegistration;
 import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class BillWebService {
@@ -65,6 +69,18 @@ public class BillWebService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "No Bill for this id");
         }
+    }
+
+    public List<JSONObject> getUserBillDetails(String email) throws JSONException {
+        UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
+        Iterable<BillDetails> bd = billDetailsRepository.findAll();
+        List<JSONObject> listEntity = new ArrayList<>();
+        for (BillDetails b : bd) {
+            if(b.getOwner_id().equalsIgnoreCase(user.getId())){
+                listEntity.add(utilityClass.getBillDetailJSON(b));
+            }
+        }
+        return listEntity;
     }
 
     public boolean deleteBillDetailsByUserId(String billId, String email) {
