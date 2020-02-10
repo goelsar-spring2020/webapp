@@ -7,8 +7,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Base64;
-import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
@@ -119,15 +121,5 @@ public class UtilityClass {
         entity.put("account_created", usr.getAccount_created());
         entity.put("account_updated", usr.getAccount_updated());
         return entity;
-    }
-
-    public String getCSVColumnValue(List<String> categories) {
-        StringBuilder result = new StringBuilder();
-        for (String category : categories) {
-            result.append(category);
-            result.append(",");
-        }
-        String res = result.toString().substring(0, result.length() - 1);
-        return res;
     }
 }

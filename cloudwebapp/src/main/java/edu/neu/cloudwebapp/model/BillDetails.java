@@ -41,4 +41,6 @@ public class BillDetails {
     @CollectionTable(name = "categories", joinColumns = @JoinColumn(name = "id"))
     @Column(name = "categories")
     private List<String> categories = new ArrayList<>();
+    @Embedded
+    private FileAttachment attachment;
 }
