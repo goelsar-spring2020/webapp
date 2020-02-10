@@ -8,8 +8,6 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
@@ -121,5 +119,20 @@ public class UtilityClass {
         entity.put("account_created", usr.getAccount_created());
         entity.put("account_updated", usr.getAccount_updated());
         return entity;
+    }
+
+
+    public boolean deleteFile(String billId) {
+        File dir = new File("/var/tmp/" + billId);
+
+        if (dir.isDirectory() == false) {
+            return false;
+        }
+        File[] listFiles = dir.listFiles();
+        for (File file : listFiles) {
+            file.delete();
+        }
+        dir.delete();
+        return true;
     }
 }
