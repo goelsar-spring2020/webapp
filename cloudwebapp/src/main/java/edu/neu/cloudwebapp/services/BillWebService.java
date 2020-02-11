@@ -6,7 +6,6 @@ import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

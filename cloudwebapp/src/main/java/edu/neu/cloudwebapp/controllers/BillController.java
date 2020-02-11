@@ -51,21 +51,22 @@ public class BillController {
     @ResponseStatus(HttpStatus.OK)
     public List<BillDetails> getBillDetails(@RequestHeader(value = "Authorization") String auth) throws JSONException {
         JSONObject entity = new JSONObject();
-        String message="";
+        String message = "";
         try {
             String authorization = utilityClass.authEncode(auth);
             String[] headerAuth = authorization.split(":");
             String email = headerAuth[0];
             String password = headerAuth[1];
             List<BillDetails> listEntity = billWebService.getUserBillDetails(email);
-            if (listEntity.size() > 0){
+            if (listEntity.size() > 0) {
                 return listEntity;
             }
             message = "No Bills Found for this user";
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
-        } catch ( Exception ex) {
-            if(message.contains("No Bills"))
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);;
+        } catch (Exception ex) {
+            if (message.contains("No Bills"))
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+            ;
             message = "Invalid GET HttpRequest";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }

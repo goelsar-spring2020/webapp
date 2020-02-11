@@ -38,7 +38,7 @@ public class FileController {
         if (attachment != null && auth != null) {
             String fileName = attachment.getOriginalFilename();
             if (fileName.endsWith(".pdf") || fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png")) {
-                String authorization = utilityClass.authEncode(auth);
+                String authorization = UtilityClass.authEncode(auth);
                 String[] headerAuth = authorization.split(":");
                 String email = headerAuth[0];
                 String password = headerAuth[1];
@@ -74,7 +74,7 @@ public class FileController {
     public FileAttachment getFileAttachment(@PathVariable(value = "billId") String
                                                     billId, @PathVariable(value = "fileId") String fileId, @RequestHeader(value = "Authorization") String auth) {
         if (billId != null && fileId != null) {
-            String authorization = utilityClass.authEncode(auth);
+            String authorization = UtilityClass.authEncode(auth);
             String[] headerAuth = authorization.split(":");
             String email = headerAuth[0];
             String password = headerAuth[1];
@@ -96,12 +96,12 @@ public class FileController {
     public void deleteFileAttachment(@PathVariable(value = "billId") String
                                              billId, @PathVariable(value = "fileId") String fileId, @RequestHeader(value = "Authorization") String auth) {
         if (billId != null) {
-            String authorization = utilityClass.authEncode(auth);
+            String authorization = UtilityClass.authEncode(auth);
             String[] headerAuth = authorization.split(":");
             String email = headerAuth[0];
             String password = headerAuth[1];
             BillDetails billDetails = billWebService.getBillDetailsByUserId(billId, email);
-            if (billDetails.getAttachment()!=null && billDetails.getAttachment().getId().equalsIgnoreCase(fileId)) {
+            if (billDetails.getAttachment() != null && billDetails.getAttachment().getId().equalsIgnoreCase(fileId)) {
                 utilityClass.deleteFile(billId);
                 billDetails.setAttachment(null);
                 billDetailsRepository.save(billDetails);
