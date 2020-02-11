@@ -72,13 +72,13 @@ public class BillWebService {
         }
     }
 
-    public List<JSONObject> getUserBillDetails(String email) throws JSONException {
+    public List<BillDetails> getUserBillDetails(String email) throws JSONException {
         UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
         Iterable<BillDetails> bd = billDetailsRepository.findAll();
-        List<JSONObject> listEntity = new ArrayList<>();
+        List<BillDetails> listEntity = new ArrayList<>();
         for (BillDetails b : bd) {
             if (b.getOwner_id().equalsIgnoreCase(user.getId())) {
-                listEntity.add(utilityClass.getBillDetailJSON(b));
+                listEntity.add(b);
             }
         }
         return listEntity;
@@ -115,6 +115,7 @@ public class BillWebService {
                     bill.setCategories(billDetails.getCategories());
                     bill.setUpdated_ts(new Date());
                     bill.setPaymentStatus(billDetails.getPaymentStatus());
+                    bill.setAttachment(bill.getAttachment());
                     billDetailsRepository.save(bill);
                 } else {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized to update the bill details");

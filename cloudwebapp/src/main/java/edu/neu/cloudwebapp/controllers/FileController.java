@@ -2,6 +2,7 @@ package edu.neu.cloudwebapp.controllers;
 
 import edu.neu.cloudwebapp.model.BillDetails;
 import edu.neu.cloudwebapp.model.FileAttachment;
+import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.services.BillWebService;
 import edu.neu.cloudwebapp.services.FileWebService;
 import edu.neu.cloudwebapp.utility.UtilityClass;
@@ -14,26 +15,26 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @CrossOrigin
 public class FileController {
 
+    private static String UPLOADED_FOLDER = "/var/tmp/";
     @Autowired
     private BillWebService billWebService;
-
     @Autowired
     private FileWebService fileWebService;
-
     @Autowired
     private UtilityClass utilityClass;
-
-    private static String UPLOADED_FOLDER = "/var/tmp/";
+    @Autowired
+    private BillDetailsRepository billDetailsRepository;
 
     @RequestMapping(value = "/v1/bill/{id}/file", method = RequestMethod.POST, produces = "application/json",
             consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.CREATED)
-    public FileAttachment postFileAttachment(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth, @RequestParam("file") MultipartFile attachment) throws IOException {
+    public FileAttachment postFileAttachment(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth, @RequestParam("file") MultipartFile attachment) throws IOException, NoSuchAlgorithmException {
         if (attachment != null && auth != null) {
             String fileName = attachment.getOriginalFilename();
             if (fileName.endsWith(".pdf") || fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png")) {
@@ -43,7 +44,7 @@ public class FileController {
                 String password = headerAuth[1];
                 BillDetails billDetails = billWebService.getBillDetailsByUserId(billId, email);
                 if (billDetails != null) {
-                    File targetFile = new File(UPLOADED_FOLDER + billDetails.getId() + "/" + attachment.getOriginalFilename());
+                    File targetFile = new File(UPLOADED_FOLDER + billDetails.getId() + "/" + fileName);
                     File parent = targetFile.getParentFile();
                     if (!parent.exists() && !parent.mkdirs()) {
                         throw new IllegalStateException("Couldn't create dir: " + parent);
@@ -53,13 +54,13 @@ public class FileController {
                     FileOutputStream fout = new FileOutputStream(targetFile);
                     fout.write(attachment.getBytes());
                     fout.close();
-                    return fileWebService.addFileAttachment(billDetails, attachment.getOriginalFilename());
-                } else{
-                    String message = "Unsupportive File Type";
+                    return fileWebService.addFileAttachment(billDetails, fileName, attachment.getContentType(), attachment.hashCode(), attachment.getSize(), attachment.getBytes());
+                } else {
+                    String message = "No Bill Id found";
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
                 }
             } else {
-                String message = "No Bill Id found";
+                String message = "Unsupportive File Type";
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
             }
         } else {
@@ -78,7 +79,7 @@ public class FileController {
             String email = headerAuth[0];
             String password = headerAuth[1];
             BillDetails billDetails = billWebService.getBillDetailsByUserId(billId, email);
-            if (billDetails.getAttachment().getFileId().equalsIgnoreCase(fileId)) {
+            if (billDetails.getAttachment().getId().equalsIgnoreCase(fileId)) {
                 return billDetails.getAttachment();
             } else {
                 String message = "No Attachments found for this Bill ID";
@@ -100,9 +101,10 @@ public class FileController {
             String email = headerAuth[0];
             String password = headerAuth[1];
             BillDetails billDetails = billWebService.getBillDetailsByUserId(billId, email);
-            if (billDetails.getAttachment().getFileId().equalsIgnoreCase(fileId)) {
+            if (billDetails.getAttachment()!=null && billDetails.getAttachment().getId().equalsIgnoreCase(fileId)) {
                 utilityClass.deleteFile(billId);
                 billDetails.setAttachment(null);
+                billDetailsRepository.save(billDetails);
             } else {
                 String message = "File Attachment Does Not exists";
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);

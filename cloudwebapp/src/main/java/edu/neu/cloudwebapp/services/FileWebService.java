@@ -4,11 +4,13 @@ import edu.neu.cloudwebapp.model.BillDetails;
 import edu.neu.cloudwebapp.model.FileAttachment;
 import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
+import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 @Service
@@ -20,18 +22,25 @@ public class FileWebService {
     @Autowired
     private UserRegistrationRepository userRegistrationRepository;
 
-    public FileAttachment addFileAttachment(BillDetails billDetails, String fileName) {
+    @Autowired
+    private UtilityClass utilityClass;
+
+    public FileAttachment addFileAttachment(BillDetails billDetails, String fileName, String contentType, int hashcode, long filesize, byte[] getbytes) throws NoSuchAlgorithmException {
         if (billDetails != null && billDetails.getAttachment() == null) {
             FileAttachment file = new FileAttachment();
-            file.setFileId(java.util.UUID.randomUUID().toString());
-            file.setFileName(fileName);
+            file.setId(java.util.UUID.randomUUID().toString());
+            file.setFile_name(fileName);
             file.setUrl("/var/tmp/" + billDetails.getId() + "/" + fileName);
-            file.setUploadDate(new Date());
+            file.setUpload_date(new Date());
+            file.setContentType(contentType);
+            file.setHashcode(String.valueOf(hashcode));
+            file.setFilesize(String.valueOf(filesize));
+            file.setMd5Hash(utilityClass.computeMD5Hash(getbytes));
             billDetails.setAttachment(file);
             billDetailsRepository.save(billDetails);
             return file;
         } else {
-            String message = "File is already exists" + "\n" + "Delete the existing one to add the new file";
+            String message = "A File Attachment already exists";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }

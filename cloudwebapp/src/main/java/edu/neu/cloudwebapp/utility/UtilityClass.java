@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
@@ -106,7 +108,7 @@ public class UtilityClass {
         entity.put("amount_due", bill.getAmount_due());
         entity.put("categories", bill.getCategories());
         entity.put("paymentStatus", bill.getPaymentStatus());
-        entity.put("attachment",bill.getAttachment());
+        entity.put("attachment", bill.getAttachment());
         return entity;
     }
 
@@ -135,5 +137,17 @@ public class UtilityClass {
         }
         dir.delete();
         return true;
+    }
+
+    public String computeMD5Hash(byte[] data) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+
+        byte[] digest = messageDigest.digest(data);
+
+        StringBuffer sb = new StringBuffer();
+        for (byte b : digest) {
+            sb.append(Integer.toHexString((int) (b & 0xff)));
+        }
+        return sb.toString();
     }
 }
