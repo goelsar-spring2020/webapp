@@ -28,9 +28,10 @@ public class FileWebService {
             file.setUrl("/var/tmp/" + billDetails.getId() + "/" + fileName);
             file.setUploadDate(new Date());
             billDetails.setAttachment(file);
+            billDetailsRepository.save(billDetails);
             return file;
         } else {
-            String message = "File is already exists"+ "\n" +"Delete the existing one to add the new file";
+            String message = "File is already exists" + "\n" + "Delete the existing one to add the new file";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }

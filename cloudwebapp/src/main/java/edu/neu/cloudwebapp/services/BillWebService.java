@@ -44,6 +44,7 @@ public class BillWebService {
                 bill.setAmount_due(bill.getAmount_due());
                 bill.setCategories(bill.getCategories());
                 bill.setPaymentStatus(bill.getPaymentStatus());
+                bill.setAttachment(null);
                 billDetailsRepository.save(bill);
                 return billDetailsRepository.findBillDetailsById(bill.getId());
             } else {

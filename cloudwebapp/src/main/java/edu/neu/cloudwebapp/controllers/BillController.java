@@ -26,7 +26,7 @@ public class BillController {
 
     @RequestMapping(value = "/v1/bill/", method = RequestMethod.POST, produces = "application/json",
             consumes = "application/json")
-    public ResponseEntity<String> addBillDetails(@RequestHeader(value = "Authorization") String auth, @RequestBody BillDetails bill) throws JSONException {
+    public BillDetails addBillDetails(@RequestHeader(value = "Authorization") String auth, @RequestBody BillDetails bill) throws JSONException {
         JSONObject entity = new JSONObject();
         String result = "";
         if (bill != null) {
@@ -37,12 +37,14 @@ public class BillController {
             BillDetails bd = billWebService.addBill(email, bill);
             if (bd != null) {
                 entity = utilityClass.getBillDetailJSON(bd);
-                return new ResponseEntity<String>(entity.toString(), HttpStatus.CREATED);
+                return bd;
+                //return new ResponseEntity<String>(entity.toString(), HttpStatus.CREATED);
             }
         }
         entity.put("error", "Invalid POST HTTP Request");
         entity.put("StatusCode", HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<String>(entity.toString(), HttpStatus.BAD_REQUEST);
+        //return new ResponseEntity<String>(entity.toString(), HttpStatus.BAD_REQUEST);
+        return null;
     }
 
 

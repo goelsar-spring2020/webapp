@@ -13,17 +13,11 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@Table(name = "files")
 public class FileAttachment {
 
-    @Id
-    @Column(nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
+    @Column(unique = true, columnDefinition = "VARCHAR(50)")
     private String fileId;
-    @Column(nullable = false)
     private String fileName;
-    @Column(nullable = false)
     private String url;
-    @Column(nullable = false)
     private Date uploadDate;
 }

@@ -106,6 +106,7 @@ public class UtilityClass {
         entity.put("amount_due", bill.getAmount_due());
         entity.put("categories", bill.getCategories());
         entity.put("paymentStatus", bill.getPaymentStatus());
+        entity.put("attachment",bill.getAttachment());
         return entity;
     }
 
