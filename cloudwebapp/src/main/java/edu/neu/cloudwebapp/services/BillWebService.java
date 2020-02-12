@@ -88,6 +88,9 @@ public class BillWebService {
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
         if (billDetails != null) {
             if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getId())) {
+                if(billDetails.getAttachment() != null){
+                    utilityClass.deleteFile(billDetails.getId());
+                }
                 billDetailsRepository.deleteById(billId);
                 return true;
             } else {
