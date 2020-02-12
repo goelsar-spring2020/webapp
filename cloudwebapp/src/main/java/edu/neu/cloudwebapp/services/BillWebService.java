@@ -6,7 +6,6 @@ import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,6 +43,7 @@ public class BillWebService {
                 bill.setAmount_due(bill.getAmount_due());
                 bill.setCategories(bill.getCategories());
                 bill.setPaymentStatus(bill.getPaymentStatus());
+                bill.setAttachment(null);
                 billDetailsRepository.save(bill);
                 return billDetailsRepository.findBillDetailsById(bill.getId());
             } else {
@@ -71,13 +71,13 @@ public class BillWebService {
         }
     }
 
-    public List<JSONObject> getUserBillDetails(String email) throws JSONException {
+    public List<BillDetails> getUserBillDetails(String email) throws JSONException {
         UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
         Iterable<BillDetails> bd = billDetailsRepository.findAll();
-        List<JSONObject> listEntity = new ArrayList<>();
+        List<BillDetails> listEntity = new ArrayList<>();
         for (BillDetails b : bd) {
             if (b.getOwner_id().equalsIgnoreCase(user.getId())) {
-                listEntity.add(utilityClass.getBillDetailJSON(b));
+                listEntity.add(b);
             }
         }
         return listEntity;
@@ -100,7 +100,7 @@ public class BillWebService {
         }
     }
 
-    public String updateBillDetailsByID(BillDetails billDetails, String email, String billID) {
+    public BillDetails updateBillDetailsByID(BillDetails billDetails, String email, String billID) {
         String message = utilityClass.validateBillRequest(billDetails);
         if (message.contains("Success")) {
             UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
@@ -114,7 +114,9 @@ public class BillWebService {
                     bill.setCategories(billDetails.getCategories());
                     bill.setUpdated_ts(new Date());
                     bill.setPaymentStatus(billDetails.getPaymentStatus());
+                    bill.setAttachment(bill.getAttachment());
                     billDetailsRepository.save(bill);
+                    return billDetailsRepository.findBillDetailsById(bill.getId());
                 } else {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized to update the bill details");
                 }
@@ -124,6 +126,5 @@ public class BillWebService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
-        return "Success";
     }
 }

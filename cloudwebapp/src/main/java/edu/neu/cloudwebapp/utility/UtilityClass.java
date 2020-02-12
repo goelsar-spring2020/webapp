@@ -7,8 +7,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
@@ -106,6 +108,7 @@ public class UtilityClass {
         entity.put("amount_due", bill.getAmount_due());
         entity.put("categories", bill.getCategories());
         entity.put("paymentStatus", bill.getPaymentStatus());
+        entity.put("attachment", bill.getAttachment());
         return entity;
     }
 
@@ -121,13 +124,30 @@ public class UtilityClass {
         return entity;
     }
 
-    public String getCSVColumnValue(List<String> categories) {
-        StringBuilder result = new StringBuilder();
-        for (String category : categories) {
-            result.append(category);
-            result.append(",");
+
+    public boolean deleteFile(String billId) {
+        File dir = new File("/var/tmp/" + billId);
+
+        if (dir.isDirectory() == false) {
+            return false;
         }
-        String res = result.toString().substring(0, result.length() - 1);
-        return res;
+        File[] listFiles = dir.listFiles();
+        for (File file : listFiles) {
+            file.delete();
+        }
+        dir.delete();
+        return true;
+    }
+
+    public String computeMD5Hash(byte[] data) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+
+        byte[] digest = messageDigest.digest(data);
+
+        StringBuffer sb = new StringBuffer();
+        for (byte b : digest) {
+            sb.append(Integer.toHexString((int) (b & 0xff)));
+        }
+        return sb.toString();
     }
 }
