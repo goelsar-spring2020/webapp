@@ -101,18 +101,20 @@ public class BillController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.PUT, consumes = "application/json")
-    public ResponseEntity<String> updateBillByID(@RequestBody BillDetails billDetails, @PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
+    @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.PUT, consumes = "application/json", produces="application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public BillDetails updateBillByID(@RequestBody BillDetails billDetails, @PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
         String email = headerAuth[0];
         String password = headerAuth[1];
         if (billDetails != null) {
-            String result = billWebService.updateBillDetailsByID(billDetails, email, billId);
-            if (result.contains("Success")) {
-                return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            BillDetails bill = billWebService.updateBillDetailsByID(billDetails, email, billId);
+            if (bill!=null) {
+                return bill;
             }
         }
-        return new ResponseEntity<>("Invalid PUT Request", HttpStatus.BAD_REQUEST);
+        String message = "Invalid PUT Request";
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 }

@@ -100,7 +100,7 @@ public class BillWebService {
         }
     }
 
-    public String updateBillDetailsByID(BillDetails billDetails, String email, String billID) {
+    public BillDetails updateBillDetailsByID(BillDetails billDetails, String email, String billID) {
         String message = utilityClass.validateBillRequest(billDetails);
         if (message.contains("Success")) {
             UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
@@ -116,6 +116,7 @@ public class BillWebService {
                     bill.setPaymentStatus(billDetails.getPaymentStatus());
                     bill.setAttachment(bill.getAttachment());
                     billDetailsRepository.save(bill);
+                    return billDetailsRepository.findBillDetailsById(bill.getId());
                 } else {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized to update the bill details");
                 }
@@ -125,6 +126,5 @@ public class BillWebService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
-        return "Success";
     }
 }
