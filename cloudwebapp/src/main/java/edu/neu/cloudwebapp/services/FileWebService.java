@@ -6,6 +6,7 @@ import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,12 +26,15 @@ public class FileWebService {
     @Autowired
     private UtilityClass utilityClass;
 
+    @Value("${path.to.file}")
+    private String UPLOADED_FOLDER;
+
     public FileAttachment addFileAttachment(BillDetails billDetails, String fileName, String contentType, int hashcode, long filesize, byte[] getbytes) throws NoSuchAlgorithmException {
         if (billDetails != null && billDetails.getAttachment() == null) {
             FileAttachment file = new FileAttachment();
             file.setId(java.util.UUID.randomUUID().toString());
             file.setFile_name(fileName);
-            file.setUrl("/var/tmp/" + billDetails.getId() + "/" + fileName);
+            file.setUrl(UPLOADED_FOLDER + billDetails.getId() + "/" + fileName);
             file.setUpload_date(new Date());
             file.setContentType(contentType);
             file.setHashcode(String.valueOf(hashcode));

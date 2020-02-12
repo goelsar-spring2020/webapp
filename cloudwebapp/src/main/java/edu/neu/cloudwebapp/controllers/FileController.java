@@ -7,6 +7,7 @@ import edu.neu.cloudwebapp.services.BillWebService;
 import edu.neu.cloudwebapp.services.FileWebService;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +22,8 @@ import java.security.NoSuchAlgorithmException;
 @CrossOrigin
 public class FileController {
 
-    private static String UPLOADED_FOLDER = "/var/tmp/";
+    @Value("${path.to.file}")
+    private String UPLOADED_FOLDER;
     @Autowired
     private BillWebService billWebService;
     @Autowired
