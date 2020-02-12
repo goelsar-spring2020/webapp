@@ -5,6 +5,7 @@ import edu.neu.cloudwebapp.model.PaymentStatus;
 import edu.neu.cloudwebapp.model.UserRegistration;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -15,6 +16,10 @@ import java.util.regex.Pattern;
 
 @Component
 public class UtilityClass {
+
+    @Value("${path.to.file}")
+    private String UPLOADED_FOLDER;
+
 
     //Method to Decode the Base64 Token saved in Header Authorization
     public static String authEncode(String authorization) {
@@ -126,7 +131,7 @@ public class UtilityClass {
 
 
     public boolean deleteFile(String billId) {
-        File dir = new File("/var/tmp/" + billId);
+        File dir = new File(UPLOADED_FOLDER + billId);
 
         if (dir.isDirectory() == false) {
             return false;
