@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -127,21 +126,6 @@ public class UtilityClass {
         entity.put("account_created", usr.getAccount_created());
         entity.put("account_updated", usr.getAccount_updated());
         return entity;
-    }
-
-
-    public boolean deleteFile(String billId) {
-        File dir = new File(UPLOADED_FOLDER + billId);
-
-        if (dir.isDirectory() == false) {
-            return false;
-        }
-        File[] listFiles = dir.listFiles();
-        for (File file : listFiles) {
-            file.delete();
-        }
-        dir.delete();
-        return true;
     }
 
     public String computeMD5Hash(byte[] data) throws NoSuchAlgorithmException {
