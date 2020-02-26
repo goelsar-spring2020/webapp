@@ -27,6 +27,9 @@ public class BillWebService {
     @Autowired
     private UtilityClass utilityClass;
 
+    @Autowired
+    private FileHandlerService fileHandlerService;
+
     //Method to add Bills in the database
     public BillDetails addBill(String userEmail, BillDetails bill) {
         String message = utilityClass.validateBillRequest(bill);
@@ -83,13 +86,13 @@ public class BillWebService {
         return listEntity;
     }
 
-    public boolean deleteBillDetailsByUserId(String billId, String email) {
+    public boolean deleteBillDetailsByUserId(String billId, String email) throws Exception {
         BillDetails billDetails = billDetailsRepository.findBillDetailsById(billId);
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
         if (billDetails != null) {
             if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getId())) {
-                if(billDetails.getAttachment() != null){
-                    utilityClass.deleteFile(billDetails.getId());
+                if (billDetails.getAttachment() != null) {
+                    fileHandlerService.deleteFile(billDetails);
                 }
                 billDetailsRepository.deleteById(billId);
                 return true;

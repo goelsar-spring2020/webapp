@@ -90,7 +90,7 @@ public class BillController {
     }
 
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteBillByID(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
+    public ResponseEntity<String> deleteBillByID(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws Exception {
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
         String email = headerAuth[0];
@@ -101,7 +101,7 @@ public class BillController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.PUT, consumes = "application/json", produces="application/json")
+    @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public BillDetails updateBillByID(@RequestBody BillDetails billDetails, @PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
         String authorization = utilityClass.authEncode(auth);
@@ -110,7 +110,7 @@ public class BillController {
         String password = headerAuth[1];
         if (billDetails != null) {
             BillDetails bill = billWebService.updateBillDetailsByID(billDetails, email, billId);
-            if (bill!=null) {
+            if (bill != null) {
                 return bill;
             }
         }
