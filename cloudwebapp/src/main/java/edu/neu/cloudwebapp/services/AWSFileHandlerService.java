@@ -45,6 +45,7 @@ public class AWSFileHandlerService implements FileHandlerService {
         try {
             inputStream = attachment.getInputStream();
             metadata.setContentLength(attachment.getSize());
+            metadata.setContentType(attachment.getContentType());
         } catch (IOException e) {
             e.printStackTrace();
         }
