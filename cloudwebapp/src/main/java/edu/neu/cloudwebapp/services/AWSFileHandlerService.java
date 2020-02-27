@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.S3Object;
 import edu.neu.cloudwebapp.model.BillDetails;
 import edu.neu.cloudwebapp.model.FileAttachment;
 import edu.neu.cloudwebapp.repository.BillDetailsRepository;
@@ -40,21 +41,25 @@ public class AWSFileHandlerService implements FileHandlerService {
     public FileAttachment uploadFile(MultipartFile attachment, BillDetails billDetails, String fileName) throws Exception {
         String name = billDetails.getId() + "/" + fileName;
         InputStream inputStream = null;
+        ObjectMetadata metadata = new ObjectMetadata();
         try {
             inputStream = attachment.getInputStream();
+            metadata.setContentLength(attachment.getSize());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        PutObjectResult result = s3client.putObject(bucketName, name, attachment.getInputStream(), new ObjectMetadata());
+        PutObjectResult result = s3client.putObject(bucketName, name, attachment.getInputStream(), metadata);
+        S3Object obj = s3client.getObject(bucketName, name);
+
 
         FileAttachment fileAttachment = new FileAttachment();
         fileAttachment.setId(java.util.UUID.randomUUID().toString());
         fileAttachment.setFile_name(fileName);
         fileAttachment.setUrl(name);
         fileAttachment.setUpload_date(new Date());
-        fileAttachment.setContentType(result.getMetadata().getContentType());
-        fileAttachment.setHashcode(String.valueOf(attachment.hashCode()));
-        fileAttachment.setFilesize(String.valueOf(result.getMetadata().getContentLength()));
+        fileAttachment.setContentType(obj.getObjectMetadata().getContentType());
+        fileAttachment.setHashcode(String.valueOf(obj.getObjectContent().hashCode()));
+        fileAttachment.setFilesize(String.valueOf(obj.getObjectMetadata().getContentLength()));
         fileAttachment.setMd5Hash(result.getContentMd5());
         billDetails.setAttachment(fileAttachment);
         billDetailsRepository.save(billDetails);
