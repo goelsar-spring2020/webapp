@@ -78,7 +78,7 @@ jobs:
             echo "Copying all .yml files from ../ directory to the codedeploy_artifact"
             cp ../*.yml .
             echo "Copying the jar file from ../target/demo-0.0.1-SNAPSHOT.jar to the codedeploy_artifact"
-            cp ../cloudwebapp/target/demo-0.0.1-SNAPSHOT.jar .
+            cp ../cloudwebapp/target/cloudwebapp-0.0.1-SNAPSHOT.jar .
             echo "current directory content"
             ls -al
             echo "Zipping all files in the codedeploy_artifact directory"
