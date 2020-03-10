@@ -25,9 +25,10 @@ jobs:
       - run:
           name: Maven test
           command: cd cloudwebapp/ && mvn test
+
   build:
     docker:
-      - image: circleci/openjdk:11.0.1-jdk-stretch
+      - image: circleci/openjdk:8-jdk-stretch
       - image: circleci/mysql:8.0.18
         environment: 
           MYSQL_ROOT_PASSWORD: Sarthak@89 
@@ -45,11 +46,62 @@ jobs:
             done
             echo Failed waiting for MySQL && exit 1
       - run:
-          name: Maven build
-          command: cd cloudwebapp/ && mvn compile
+          name: Install packages
+          command: |
+            sudo apt-get update && sudo apt-get install wget zip unzip python-pip python-dev build-essential -y
+            python --version
       - run:
-          name: Maven test
-          command: cd cloudwebapp/ && mvn test
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: Build Artifact
+          command: |
+            ls -al
+            echo "Building the artifact with Maven"
+            cd cloudwebapp/ && mvn clean install
+            cd target
+            ls -al
+            cd ../..
+      - run:
+          name: Zip Artifact
+          command: |
+            echo "current build number is ${CIRCLE_BUILD_NUM}"
+            pwd
+            echo "current directory content"
+            ls -al
+            echo "Making the codedeploy_artifact directory"
+            mkdir -p codedeploy_artifact
+            echo "Changing directory to codedeploy_artifact"
+            cd codedeploy_artifact
+            echo "Copying all .sh files from ../scripts directory to the codedeploy_artifact"
+            cp ../cloudwebapp/scripts/*.sh .
+            echo "Copying all .yml files from ../ directory to the codedeploy_artifact"
+            cp ../*.yml .
+            echo "Copying the jar file from ../target/demo-0.0.1-SNAPSHOT.jar to the codedeploy_artifact"
+            cp ../cloudwebapp/target/cloudwebapp-0.0.1-SNAPSHOT.jar .
+            echo "current directory content"
+            ls -al
+            echo "Zipping all files in the codedeploy_artifact directory"
+            zip -r csye6255-webapp-${CIRCLE_BUILD_NUM}.zip .
+            ls -al
+            pwd
+            echo "Changing directory to root"
+            cd ..
+            pwd
+            ls -al
+      - run:
+          name: Upload Artifact to S3
+          command: |
+            echo "Uploading Artifact to S3 bucket ${CODE_DEPLOY_S3_BUCKET}"
+            cd codedeploy_artifact
+            aws s3 cp csye6255-webapp-${CIRCLE_BUILD_NUM}.zip s3://${CODE_DEPLOY_S3_BUCKET}
+            cd ..
+      - run:
+          name: Make CodeDeploy API call
+          command: |
+            aws configure set region ${AWS_REGION}
+            echo "Calling CodeDeploy Agent to pick the artifact and deploy on EC2 instance"
+            aws deploy create-deployment --application-name "csye6225-webapp" --deployment-group-name "csye6225-webapp-deployment" --s3-location bucket=${CODE_DEPLOY_S3_BUCKET},bundleType=zip,key=csye6255-webapp-${CIRCLE_BUILD_NUM}.zip
 
 workflows:
   version: 2
@@ -58,8 +110,4 @@ workflows:
     - pr_check
   build_deploy-workflow:
     jobs:
-    - build:
-        filters:
-          branches:
-            only:
-              - master
+    - build
