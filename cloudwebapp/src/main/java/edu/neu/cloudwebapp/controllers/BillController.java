@@ -47,7 +47,7 @@ public class BillController {
     }
 
 
-    @RequestMapping(value = "/v1/bills", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/v2/bills", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<BillDetails> getBillDetails(@RequestHeader(value = "Authorization") String auth) throws JSONException {
         JSONObject entity = new JSONObject();
