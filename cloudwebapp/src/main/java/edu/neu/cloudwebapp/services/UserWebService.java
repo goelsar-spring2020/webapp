@@ -1,5 +1,6 @@
 package edu.neu.cloudwebapp.services;
 
+import com.timgroup.statsd.StatsDClient;
 import edu.neu.cloudwebapp.model.UserRegistration;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.util.Date;
 
@@ -25,29 +27,33 @@ public class UserWebService {
     @Autowired
     private UtilityClass utilityClass;
 
+    @Autowired
+    private StatsDClient statsDClient;
+
     private final static Logger logger = LoggerFactory.getLogger(UserWebService.class);
 
     //Method user by GET Request mapping RestController to get the user details
     public UserRegistration getUser(String email, String password) throws JSONException {
         UserRegistration usr = null;
-        boolean flag = false;
         try {
             if ((email != null || !email.isEmpty()) && (password != null && !password.isEmpty())) {
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
                 usr = userRegistrationRepository.findUserRegistrationByEmail(email);
+                stopWatch.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.user.self.api.get",stopWatch.getLastTaskTimeMillis());
                 if (usr != null && passwordEncoder.matches(password, usr.getPassword())) {
                     return usr;
-                } else
-                    flag = true;
-            } else
-                flag = true;
-            if (flag = true) {
+                } else {
+                    throw new BadCredentialsException("External user can not be validated");
+                }
+            } else{
                 throw new BadCredentialsException("External user can not be validated");
             }
         } catch (Exception e) {
             logger.error("External user can not be validated");
             throw new BadCredentialsException("External user can not be validated");
         }
-        return usr;
     }
 
     //Method user by POST Request mapping RestController to register the new user
@@ -63,7 +69,11 @@ public class UserWebService {
                 ur.setAccount_created(new Date());
                 ur.setAccount_updated(new Date());
                 ur.setPassword(passwordEncoder.encode(ur.getPassword()));
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
                 userRegistrationRepository.save(ur);
+                stopWatch.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.user.api.post",stopWatch.getLastTaskTimeMillis());
             }
         }
         return message;
@@ -77,6 +87,8 @@ public class UserWebService {
                 logger.error("Token Credentials & user email do not match");
                 return "Token Credentials & user email do not match";
             }
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             UserRegistration usr = userRegistrationRepository.findUserRegistrationByEmail(userRegistration.getEmail());
             if (passwordEncoder.matches(password, usr.getPassword())) {
                 usr.setPassword(passwordEncoder.encode(userRegistration.getPassword()));
@@ -84,9 +96,12 @@ public class UserWebService {
                 usr.setLastName(userRegistration.getLastName());
                 usr.setAccount_updated(new Date());
                 userRegistrationRepository.save(usr);
-            } else
+            } else {
                 logger.error("Bad Request");
                 return "Bad Request";
+            }
+            stopWatch.stop();
+            statsDClient.recordExecutionTime("timer.db.v1.user.self.api.put",stopWatch.getLastTaskTimeMillis());
         }
         return message;
     }
