@@ -37,6 +37,7 @@ public class FileController {
     public FileAttachment postFileAttachment(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth, @RequestParam("file") MultipartFile attachment) throws Exception {
         statsDClient.incrementCounter("endpoint.v1.bill.id.file.api.post");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Post File request : \"/v1/bill/{id}/file\"");
         if (attachment != null && auth != null) {
             String fileName = attachment.getOriginalFilename();
@@ -92,6 +93,7 @@ public class FileController {
                                                     billId, @PathVariable(value = "fileId") String fileId, @RequestHeader(value = "Authorization") String auth) {
         statsDClient.incrementCounter("endpoint.v1.bill.billId.file.fileId.api.get");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Get File request : \"/v1/bill/{billId}/file/{fileId}\"");
         if (billId != null && fileId != null) {
             String authorization = UtilityClass.authEncode(auth);
@@ -126,6 +128,7 @@ public class FileController {
                                              billId, @PathVariable(value = "fileId") String fileId, @RequestHeader(value = "Authorization") String auth) throws Exception {
         statsDClient.incrementCounter("endpoint.v1.bill.billId.file.fileId.api.delete");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Delete File request : \"/v1/bill/{billId}/file/{fileId}\"");
         if (billId != null) {
             String authorization = UtilityClass.authEncode(auth);

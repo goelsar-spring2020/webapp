@@ -34,6 +34,7 @@ public class UserController {
     public ResponseEntity<String> registerUserDetails(@RequestBody UserRegistration userRegistration) throws JSONException {
         statsDClient.incrementCounter("endpoint.v1.user.api.post");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("POST request : \"/v1/user\"");
         JSONObject entity = new JSONObject();
         String result = "";
@@ -78,6 +79,7 @@ public class UserController {
     public ResponseEntity<String> getUserDetails(@RequestHeader(value = "Authorization") String auth) throws JSONException {
         statsDClient.incrementCounter("endpoint.v1.user.self.api.get");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Get User request : \"/v1/user/self\"");
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
@@ -95,6 +97,7 @@ public class UserController {
     public ResponseEntity<String> updateUserDetails(@RequestHeader(value = "Authorization") String auth, @RequestBody UserRegistration userRegistration) throws Exception {
         statsDClient.incrementCounter("endpoint.v1.user.self.api.put");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Put User request : \"/v1/user/self\"");
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
