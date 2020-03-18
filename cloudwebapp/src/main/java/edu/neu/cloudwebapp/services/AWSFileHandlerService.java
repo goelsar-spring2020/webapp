@@ -92,7 +92,7 @@ public class AWSFileHandlerService implements FileHandlerService {
         stopWatchS3.start();
         s3client.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(fileName));
         stopWatchS3.stop();
-        statsDClient.recordExecutionTime("timer.s3.v1.bill.id.file.api.post",stopWatchS3.getLastTaskTimeMillis());
+        statsDClient.recordExecutionTime("timer.s3.v1.bill.id.file.api.delete",stopWatchS3.getLastTaskTimeMillis());
         logger.info("Successfully deleted object from S3");
         return true;
     }
