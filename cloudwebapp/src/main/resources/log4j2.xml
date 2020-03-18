@@ -25,7 +25,7 @@
 		</RollingFile>
 	</Appenders>
 	<Loggers>
-		<Logger name="com.cloud.usermanagement" level="info" additivity="false">
+		<Logger name="edu.neu" level="info" additivity="false">
 			<AppenderRef ref="FileAppender" />
 		</Logger>
 

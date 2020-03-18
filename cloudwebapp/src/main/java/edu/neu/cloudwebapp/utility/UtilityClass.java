@@ -7,6 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,6 +21,7 @@ public class UtilityClass {
     @Value("${path.to.file}")
     private String UPLOADED_FOLDER;
 
+    private final static Logger logger = LoggerFactory.getLogger(UtilityClass.class);
 
     //Method to Decode the Base64 Token saved in Header Authorization
     public static String authEncode(String authorization) {
@@ -26,8 +29,10 @@ public class UtilityClass {
             //assert authorization.substring(0, 6).equals("Basic");
             String basicAuthEncoded = authorization.substring(6);
             String basicAuthAsString = new String(Base64.getDecoder().decode(basicAuthEncoded.getBytes()));
+            logger.debug("Valid Authorization Request");
             return basicAuthAsString;
         } else {
+            logger.error("Empty Authorization Header");
             throw new NullPointerException("Authorization value Null");
         }
     }
@@ -45,24 +50,31 @@ public class UtilityClass {
     //Validate the incoming Bill POST/PUT HttpRequests
     public static String validateBillRequest(BillDetails bill) {
         if (bill.getVendor() == null || bill.getVendor().isEmpty()) {
+            logger.error("Invalid - Vendor Details Empty in Bill Request");
             return "Vendor details are required and can not be left empty";
         }
         if (bill.getAmount_due() == null || bill.getAmount_due() <= 0.0) {
+            logger.error("Invalid - Amount Empty in Bill Request");
             return "Amount details are required and can not be left empty";
         }
         if (bill.getCategories() == null || bill.getCategories().size() <= 0) {
+            logger.error("Invalid - Categories Empty in Bill Request");
             return "Categories details are required and can not be left empty";
         }
         if (bill.getPaymentStatus() == null) {
+            logger.error("Invalid - Payment Status Empty in Bill Request");
             return "Payment Status details are required and can not be left empty";
         }
         if (bill.getBill_date() == null) {
+            logger.error("Invalid - Bill Date Empty in Bill Request");
             return "Bill Date can not be left empty";
         }
         if (bill.getDue_date() == null) {
+            logger.error("Invalid - Due Date Empty in Bill Request");
             return "Due Date can not be left empty";
         }
         if (bill.getId() != null || bill.getCreated_ts() != null || bill.getUpdated_ts() != null || bill.getOwner_id() != null) {
+            logger.error("Invalid Bill Request readOnly fields not allowed");
             return "INVALID REQUEST : READ ONLY FIELDS NOT ALLOWED IN THE REQUEST";
         }
         return "Success";
@@ -70,21 +82,27 @@ public class UtilityClass {
 
     public String validateUserRequest(UserRegistration userRegistration) {
         if (userRegistration.getEmail() == null || userRegistration.getEmail().isEmpty()) {
+            logger.error("Email empty in User Request");
             return "Email Can Not Be Empty";
         }
         if (userRegistration.getPassword() == null || userRegistration.getPassword().isEmpty()) {
+            logger.error("Password empty in User Request");
             return "Password Can Not Be Empty";
         }
         if (userRegistration.getFirstName() == null || userRegistration.getFirstName().isEmpty()) {
+            logger.error("FirstName empty in User Request");
             return "First Name Can Not Be Empty";
         }
         if (userRegistration.getLastName() == null || userRegistration.getLastName().isEmpty()) {
+            logger.error("LastName empty in User Request");
             return "Last Name Can Not Be Empty";
         }
         if (!isPasswordValid(userRegistration.getPassword())) {
+            logger.error("Passowrd does not adher to NIST standard in User Request");
             return "Password doesn't adhere to NIST standards";
         }
         if (userRegistration.getId() != null || userRegistration.getAccount_created() != null || userRegistration.getAccount_updated() != null) {
+            logger.error("Invalid User Request readOnly fields not allowed");
             return "Invalid HttpRequest readOnly fields not allowed";
         }
         return "Success";

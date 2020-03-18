@@ -6,6 +6,8 @@ import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.repository.UserRegistrationRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class BillWebService {
     @Autowired
     private FileHandlerService fileHandlerService;
 
+    private final static Logger logger = LoggerFactory.getLogger(BillWebService.class);
+
     //Method to add Bills in the database
     public BillDetails addBill(String userEmail, BillDetails bill) {
         String message = utilityClass.validateBillRequest(bill);
@@ -53,6 +57,7 @@ public class BillWebService {
                 throw new Exception();
             }
         } catch (Exception ex) {
+            logger.error("Invalid Post Bill Request");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
@@ -65,10 +70,12 @@ public class BillWebService {
             if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getId())) {
                 return billDetails;
             } else {
+                logger.error("Not authorized to access the bill details");
                 throw new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Not authorized to access the bill details");
             }
         } else {
+            logger.error("No Bills Found for this id");
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "No Bill for this id");
         }
@@ -97,10 +104,12 @@ public class BillWebService {
                 billDetailsRepository.deleteById(billId);
                 return true;
             } else {
+                logger.error("Not authorized to access the bill details");
                 throw new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Not authorized to delete the bill details");
             }
         } else {
+            logger.error("No Bill Details Found for bill id");
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "No Bill Details Found for bill id " + billId);
         }
@@ -124,12 +133,15 @@ public class BillWebService {
                     billDetailsRepository.save(bill);
                     return billDetailsRepository.findBillDetailsById(bill.getId());
                 } else {
+                    logger.error("User not authorized to update the bill details");
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized to update the bill details");
                 }
             } else {
+                logger.error("No Bill Details Found for bill id");
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Bill Details Found for bill id " + billID);
             }
         } else {
+            logger.error("Bad Put Bill Request: " + message);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
