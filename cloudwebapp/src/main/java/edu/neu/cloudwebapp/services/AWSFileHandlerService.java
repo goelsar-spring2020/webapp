@@ -9,6 +9,8 @@ import com.amazonaws.services.s3.model.S3Object;
 import edu.neu.cloudwebapp.model.BillDetails;
 import edu.neu.cloudwebapp.model.FileAttachment;
 import edu.neu.cloudwebapp.repository.BillDetailsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -32,6 +34,8 @@ public class AWSFileHandlerService implements FileHandlerService {
     @Value("${amazon.s3.bucketName}")
     private String bucketName;
 
+    private final static Logger logger = LoggerFactory.getLogger(AWSFileHandlerService.class);
+
     @PostConstruct
     private void initializeAmazon() {
         this.s3client = AmazonS3ClientBuilder.standard().build();
@@ -47,6 +51,7 @@ public class AWSFileHandlerService implements FileHandlerService {
             metadata.setContentLength(attachment.getSize());
             metadata.setContentType(attachment.getContentType());
         } catch (IOException e) {
+            logger.error("Error in uploading File to S3: "+e.getMessage());
             e.printStackTrace();
         }
         PutObjectResult result = s3client.putObject(bucketName, name, attachment.getInputStream(), metadata);
@@ -64,6 +69,7 @@ public class AWSFileHandlerService implements FileHandlerService {
         fileAttachment.setMd5Hash(result.getContentMd5());
         billDetails.setAttachment(fileAttachment);
         billDetailsRepository.save(billDetails);
+        logger.info("Successfully uploaded object from S3");
         return fileAttachment;
     }
 
@@ -71,6 +77,7 @@ public class AWSFileHandlerService implements FileHandlerService {
     public boolean deleteFile(BillDetails billDetails) throws Exception {
         String fileName = billDetails.getAttachment().getUrl().toString();
         s3client.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(fileName));
+        logger.info("Successfully deleted object from S3");
         return true;
     }
 }

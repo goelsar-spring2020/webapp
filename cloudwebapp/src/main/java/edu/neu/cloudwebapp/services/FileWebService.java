@@ -4,6 +4,8 @@ import edu.neu.cloudwebapp.model.BillDetails;
 import edu.neu.cloudwebapp.model.FileAttachment;
 import edu.neu.cloudwebapp.repository.BillDetailsRepository;
 import edu.neu.cloudwebapp.utility.UtilityClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -27,11 +29,14 @@ public class FileWebService implements FileHandlerService {
     @Value("${path.to.file}")
     private String UPLOADED_FOLDER;
 
+    private final static Logger logger = LoggerFactory.getLogger(FileWebService.class);
+
     @Override
     public FileAttachment uploadFile(MultipartFile attachment, BillDetails billDetails, String fileName) throws Exception {
         File targetFile = new File(UPLOADED_FOLDER + billDetails.getId() + "/" + fileName);
         File parent = targetFile.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) {
+            logger.error("Couldn't create dir");
             throw new IllegalStateException("Couldn't create dir: " + parent);
         }
         parent.mkdirs();
