@@ -36,8 +36,7 @@ public class BillController {
     public BillDetails addBillDetails(@RequestHeader(value = "Authorization") String auth, @RequestBody BillDetails bill) throws JSONException {
         statsDClient.incrementCounter("endpoint.v1.bill.api.post");
         StopWatch stopWatch = new StopWatch();
-        JSONObject entity = new JSONObject();
-        String result = "";
+        stopWatch.start();
         logger.info("Post Bill request : \"/v1/bill/\"");
         if (bill != null) {
             String authorization = utilityClass.authEncode(auth);
@@ -46,7 +45,6 @@ public class BillController {
             String password = headerAuth[1];
             BillDetails bd = billWebService.addBill(email, bill);
             if (bd != null) {
-                entity = utilityClass.getBillDetailJSON(bd);
                 logger.debug("HTTP : 201 Created");
                 stopWatch.stop();
                 statsDClient.recordExecutionTime("timer.v1.bill.api.post",stopWatch.getLastTaskTimeMillis());
@@ -66,7 +64,7 @@ public class BillController {
     public List<BillDetails> getBillDetails(@RequestHeader(value = "Authorization") String auth) throws JSONException {
         statsDClient.incrementCounter("endpoint.v1.bills.api.get");
         StopWatch stopWatch = new StopWatch();
-        JSONObject entity = new JSONObject();
+        stopWatch.start();
         String message = "";
         logger.info("Get All Bill request : \"/v1/bills\"");
         try {
@@ -107,8 +105,8 @@ public class BillController {
     public BillDetails getBillById(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
         statsDClient.incrementCounter("endpoint.v1.bills.id.api.get");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Get Bill request : \"/v1/bill/{id}\"");
-        JSONObject entity = new JSONObject();
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
         String email = headerAuth[0];
@@ -132,6 +130,7 @@ public class BillController {
     public ResponseEntity<String> deleteBillByID(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws Exception {
         statsDClient.incrementCounter("endpoint.v1.bills.id.api.delete");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Delete Bill request : \"/v1/bill/{id}\"");
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
@@ -154,6 +153,7 @@ public class BillController {
     public BillDetails updateBillByID(@RequestBody BillDetails billDetails, @PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
         statsDClient.incrementCounter("endpoint.v1.bills.id.api.put");
         StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         logger.info("Put Bill request : \"/v1/bill/{id}\"");
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
