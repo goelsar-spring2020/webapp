@@ -43,6 +43,7 @@ public class UserController {
                 } else
                     entity.put("error", result);
                 entity.put("status_code", HttpStatus.BAD_REQUEST);
+                logger.error("Post Request failed Weak password/ Email already exist : /v1/user");
                 return new ResponseEntity<String>(entity.toString(), HttpStatus.BAD_REQUEST);
             } else {
                 entity.put("error", "Post Request Can't Be Empty");
