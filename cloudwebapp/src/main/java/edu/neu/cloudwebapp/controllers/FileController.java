@@ -24,10 +24,13 @@ public class FileController {
 
     @Autowired
     private FileHandlerService fileHandlerService;
+
     @Autowired
     private BillWebService billWebService;
+
     @Autowired
     private BillDetailsRepository billDetailsRepository;
+
     @Autowired
     private StatsDClient statsDClient;
 
@@ -140,9 +143,11 @@ public class FileController {
                 fileHandlerService.deleteFile(billDetails);
                 billDetails.setAttachment(null);
                 logger.debug("HTTP : 204 No_Content");
-                stopWatch.stop();
-                statsDClient.recordExecutionTime("timer.v1.bill.billId.file.fileId.api.delete",stopWatch.getLastTaskTimeMillis());
+                StopWatch stopwatchDB = new StopWatch();
+                stopwatchDB.start();
                 billDetailsRepository.save(billDetails);
+                stopwatchDB.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.bill.billId.file.fileId.api.delete",stopWatch.getLastTaskTimeMillis());
             } else {
                 String message = "File Attachment Does Not exists";
                 logger.error("Delete File Request - File Attachment doesn't exist : /v1/bill/{billId}/file/{fileId}");
@@ -150,6 +155,8 @@ public class FileController {
                 statsDClient.recordExecutionTime("timer.v1.bill.billId.file.fileId.api.delete",stopWatch.getLastTaskTimeMillis());
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
             }
+            stopWatch.stop();
+            statsDClient.recordExecutionTime("timer.v1.bill.billId.file.fileId.api.delete",stopWatch.getLastTaskTimeMillis());
         } else {
             String message = "Bill ID is mandatory";
             logger.error("Delete File Request - BillID is mandatory : /v1/bill/{billId}/file/{fileId}");

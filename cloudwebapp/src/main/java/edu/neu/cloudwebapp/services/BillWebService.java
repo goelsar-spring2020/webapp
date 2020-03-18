@@ -1,5 +1,6 @@
 package edu.neu.cloudwebapp.services;
 
+import com.timgroup.statsd.StatsDClient;
 import edu.neu.cloudwebapp.model.BillDetails;
 import edu.neu.cloudwebapp.model.UserRegistration;
 import edu.neu.cloudwebapp.repository.BillDetailsRepository;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ public class BillWebService {
     @Autowired
     private FileHandlerService fileHandlerService;
 
+    @Autowired
+    private StatsDClient statsDClient;
+
     private final static Logger logger = LoggerFactory.getLogger(BillWebService.class);
 
     //Method to add Bills in the database
@@ -39,6 +44,8 @@ public class BillWebService {
         String message = utilityClass.validateBillRequest(bill);
         try {
             if (message.contains("Success")) {
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
                 bill.setId(java.util.UUID.randomUUID().toString());
                 UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(userEmail);
                 bill.setOwner_id(user.getId());
@@ -52,6 +59,8 @@ public class BillWebService {
                 bill.setPaymentStatus(bill.getPaymentStatus());
                 bill.setAttachment(null);
                 billDetailsRepository.save(bill);
+                stopWatch.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.bill.api.post",stopWatch.getLastTaskTimeMillis());
                 return billDetailsRepository.findBillDetailsById(bill.getId());
             } else {
                 throw new Exception();
@@ -64,8 +73,12 @@ public class BillWebService {
 
 
     public BillDetails getBillDetailsByUserId(String billId, String email) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         BillDetails billDetails = billDetailsRepository.findBillDetailsById(billId);
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
+        stopWatch.stop();
+        statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.get",stopWatch.getLastTaskTimeMillis());
         if (billDetails != null) {
             if (billDetails.getOwner_id().equalsIgnoreCase(userRegistration.getId())) {
                 return billDetails;
@@ -82,8 +95,12 @@ public class BillWebService {
     }
 
     public List<BillDetails> getUserBillDetails(String email) throws JSONException {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
         Iterable<BillDetails> bd = billDetailsRepository.findAll();
+        stopWatch.stop();
+        statsDClient.recordExecutionTime("timer.db.v1.bills.api.get",stopWatch.getLastTaskTimeMillis());
         List<BillDetails> listEntity = new ArrayList<>();
         for (BillDetails b : bd) {
             if (b.getOwner_id().equalsIgnoreCase(user.getId())) {
@@ -94,6 +111,8 @@ public class BillWebService {
     }
 
     public boolean deleteBillDetailsByUserId(String billId, String email) throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         BillDetails billDetails = billDetailsRepository.findBillDetailsById(billId);
         UserRegistration userRegistration = userRegistrationRepository.findUserRegistrationByEmail(email);
         if (billDetails != null) {
@@ -102,13 +121,19 @@ public class BillWebService {
                     fileHandlerService.deleteFile(billDetails);
                 }
                 billDetailsRepository.deleteById(billId);
+                stopWatch.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.delete",stopWatch.getLastTaskTimeMillis());
                 return true;
             } else {
+                stopWatch.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.delete",stopWatch.getLastTaskTimeMillis());
                 logger.error("Not authorized to access the bill details");
                 throw new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Not authorized to delete the bill details");
             }
         } else {
+            stopWatch.stop();
+            statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.delete",stopWatch.getLastTaskTimeMillis());
             logger.error("No Bill Details Found for bill id");
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "No Bill Details Found for bill id " + billId);
@@ -118,6 +143,8 @@ public class BillWebService {
     public BillDetails updateBillDetailsByID(BillDetails billDetails, String email, String billID) {
         String message = utilityClass.validateBillRequest(billDetails);
         if (message.contains("Success")) {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             UserRegistration user = userRegistrationRepository.findUserRegistrationByEmail(email);
             BillDetails bill = billDetailsRepository.findBillDetailsById(billID);
             if (bill != null) {
@@ -131,12 +158,18 @@ public class BillWebService {
                     bill.setPaymentStatus(billDetails.getPaymentStatus());
                     bill.setAttachment(bill.getAttachment());
                     billDetailsRepository.save(bill);
+                    stopWatch.stop();
+                    statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.put",stopWatch.getLastTaskTimeMillis());
                     return billDetailsRepository.findBillDetailsById(bill.getId());
                 } else {
+                    stopWatch.stop();
+                    statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.put",stopWatch.getLastTaskTimeMillis());
                     logger.error("User not authorized to update the bill details");
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authorized to update the bill details");
                 }
             } else {
+                stopWatch.stop();
+                statsDClient.recordExecutionTime("timer.db.v1.bill.id.api.put",stopWatch.getLastTaskTimeMillis());
                 logger.error("No Bill Details Found for bill id");
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Bill Details Found for bill id " + billID);
             }
