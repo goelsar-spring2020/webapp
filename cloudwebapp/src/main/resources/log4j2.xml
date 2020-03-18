@@ -13,8 +13,8 @@
 
 		<!-- Rolling File Appender -->
 		<RollingFile name="FileAppender"
-			fileName="logs/csye6225-cloudwebapp.log"
-			filePattern="logs/csye6225-cloudwebapp-%d{yyyy-MM-dd}-%i.log">
+			fileName="./logs/csye6225-cloudwebapp.log"
+			filePattern="./logs/csye6225-cloudwebapp-%d{yyyy-MM-dd}-%i.log">
 			<PatternLayout>
 				<Pattern>${LOG_PATTERN}</Pattern>
 			</PatternLayout>

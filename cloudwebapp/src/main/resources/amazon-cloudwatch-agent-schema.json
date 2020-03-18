@@ -1,7 +1,7 @@
 {
     "agent": {
         "metrics_collection_interval": 10,
-        "logfile": "/var/logs/amazon-cloudwatch-agent.log"
+        "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
     },
     "logs": {
         "logs_collected": {
@@ -9,7 +9,7 @@
                 "collect_list": [
                     {
                         "file_path": "/home/ubuntu/webapp/logs/csye6225-cloudwebapp.log",
-                        "log_group_name": "csye6225_spring2020",
+                        "log_group_name": "csye6225",
                         "log_stream_name": "webapp"
               
                     }
