@@ -6,6 +6,8 @@ import edu.neu.cloudwebapp.services.BillWebService;
 import edu.neu.cloudwebapp.utility.UtilityClass;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import java.util.List;
 @RestController
 @CrossOrigin
 public class BillController {
+
+    private final static Logger logger = LoggerFactory.getLogger(BillController.class);
 
     @Autowired
     private BillWebService billWebService;
@@ -31,6 +35,7 @@ public class BillController {
     public BillDetails addBillDetails(@RequestHeader(value = "Authorization") String auth, @RequestBody BillDetails bill) throws JSONException {
         JSONObject entity = new JSONObject();
         String result = "";
+        logger.info("Post Bill request : \"/v1/bill/\"");
         if (bill != null) {
             String authorization = utilityClass.authEncode(auth);
             String[] headerAuth = authorization.split(":");
@@ -39,19 +44,22 @@ public class BillController {
             BillDetails bd = billWebService.addBill(email, bill);
             if (bd != null) {
                 entity = utilityClass.getBillDetailJSON(bd);
+                logger.debug("HTTP : 201 Created");
                 return bd;
             }
         }
         String message = "Invalid POST HTTP Request";
+        logger.error("Post BILL Request - Invalid POST HTTP Request : /v1/bill/");
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 
 
-    @RequestMapping(value = "/v2/bills", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/v1/bills", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<BillDetails> getBillDetails(@RequestHeader(value = "Authorization") String auth) throws JSONException {
         JSONObject entity = new JSONObject();
         String message = "";
+        logger.info("Get All Bill request : \"/v1/bills\"");
         try {
             String authorization = utilityClass.authEncode(auth);
             String[] headerAuth = authorization.split(":");
@@ -59,15 +67,20 @@ public class BillController {
             String password = headerAuth[1];
             List<BillDetails> listEntity = billWebService.getUserBillDetails(email);
             if (listEntity.size() > 0) {
+                logger.debug("HTTP : 200 OK");
                 return listEntity;
             }
             message = "No Bills Found for this user";
+            logger.error("Get BILL Request - No Bills Found for this user : /v1/bills");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
         } catch (Exception ex) {
-            if (message.contains("No Bills"))
+            if (message.contains("No Bills")) {
+                logger.error("Get BILL Request - No Bills : /v1/bills");
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
-            ;
+            }
+
             message = "Invalid GET HttpRequest";
+            logger.error("Get BILL Request - Invalid GET HttpRequest : /v1/bills");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
@@ -75,6 +88,7 @@ public class BillController {
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public BillDetails getBillById(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
+        logger.info("Get Bill request : \"/v1/bill/{id}\"");
         JSONObject entity = new JSONObject();
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
@@ -82,28 +96,34 @@ public class BillController {
         String password = headerAuth[1];
         BillDetails billDetails = billWebService.getBillDetailsByUserId(billId, email);
         if (billDetails != null) {
+            logger.debug("HTTP : 200 OK");
             return billDetails;
         } else {
             String message = "No Bill Found for this Id";
+            logger.error("Get BILL Request - No Bill Found for this Id : /v1/bill/{id}");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
         }
     }
 
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteBillByID(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws Exception {
+        logger.info("Delete Bill request : \"/v1/bill/{id}\"");
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
         String email = headerAuth[0];
         String password = headerAuth[1];
-        if (billWebService.deleteBillDetailsByUserId(billId, email))
+        if (billWebService.deleteBillDetailsByUserId(billId, email)) {
+            logger.debug("HTTP : 204 No_Content");
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-
+        }
+        logger.error("Delete BILL Request - Invalid bill request : /v1/bill/{id}");
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public BillDetails updateBillByID(@RequestBody BillDetails billDetails, @PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
+        logger.info("Put Bill request : \"/v1/bill/{id}\"");
         String authorization = utilityClass.authEncode(auth);
         String[] headerAuth = authorization.split(":");
         String email = headerAuth[0];
@@ -111,10 +131,12 @@ public class BillController {
         if (billDetails != null) {
             BillDetails bill = billWebService.updateBillDetailsByID(billDetails, email, billId);
             if (bill != null) {
+                logger.debug("HTTP : 200 OK");
                 return bill;
             }
         }
         String message = "Invalid PUT Request";
+        logger.error("Put BILL Request - Invalid bill request : /v1/bill/{id}");
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 }
