@@ -103,7 +103,7 @@ public class BillController {
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public BillDetails getBillById(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
-        statsDClient.incrementCounter("endpoint.v1.bills.id.api.get");
+        statsDClient.incrementCounter("endpoint.v1.bill.id.api.get");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("Get Bill request : \"/v1/bill/{id}\"");
@@ -115,20 +115,20 @@ public class BillController {
         if (billDetails != null) {
             logger.debug("HTTP : 200 OK");
             stopWatch.stop();
-            statsDClient.recordExecutionTime("timer.v1.bills.id.api.get",stopWatch.getLastTaskTimeMillis());
+            statsDClient.recordExecutionTime("timer.v1.bill.id.api.get",stopWatch.getLastTaskTimeMillis());
             return billDetails;
         } else {
             String message = "No Bill Found for this Id";
             logger.error("Get BILL Request - No Bill Found for this Id : /v1/bill/{id}");
             stopWatch.stop();
-            statsDClient.recordExecutionTime("timer.v1.bills.id.api.get",stopWatch.getLastTaskTimeMillis());
+            statsDClient.recordExecutionTime("timer.v1.bill.id.api.get",stopWatch.getLastTaskTimeMillis());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
         }
     }
 
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteBillByID(@PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws Exception {
-        statsDClient.incrementCounter("endpoint.v1.bills.id.api.delete");
+        statsDClient.incrementCounter("endpoint.v1.bill.id.api.delete");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("Delete Bill request : \"/v1/bill/{id}\"");
@@ -139,19 +139,19 @@ public class BillController {
         if (billWebService.deleteBillDetailsByUserId(billId, email)) {
             logger.debug("HTTP : 204 No_Content");
             stopWatch.stop();
-            statsDClient.recordExecutionTime("timer.v1.bills.id.api.delete",stopWatch.getLastTaskTimeMillis());
+            statsDClient.recordExecutionTime("timer.v1.bill.id.api.delete",stopWatch.getLastTaskTimeMillis());
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
         logger.error("Delete BILL Request - Invalid bill request : /v1/bill/{id}");
         stopWatch.stop();
-        statsDClient.recordExecutionTime("timer.v1.bills.id.api.delete",stopWatch.getLastTaskTimeMillis());
+        statsDClient.recordExecutionTime("timer.v1.bill.id.api.delete",stopWatch.getLastTaskTimeMillis());
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "/v1/bill/{id}", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public BillDetails updateBillByID(@RequestBody BillDetails billDetails, @PathVariable(value = "id") String billId, @RequestHeader(value = "Authorization") String auth) throws JSONException {
-        statsDClient.incrementCounter("endpoint.v1.bills.id.api.put");
+        statsDClient.incrementCounter("endpoint.v1.bill.id.api.put");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("Put Bill request : \"/v1/bill/{id}\"");
@@ -164,14 +164,14 @@ public class BillController {
             if (bill != null) {
                 logger.debug("HTTP : 200 OK");
                 stopWatch.stop();
-                statsDClient.recordExecutionTime("timer.v1.bills.id.api.put",stopWatch.getLastTaskTimeMillis());
+                statsDClient.recordExecutionTime("timer.v1.bill.id.api.put",stopWatch.getLastTaskTimeMillis());
                 return bill;
             }
         }
         String message = "Invalid PUT Request";
         logger.error("Put BILL Request - Invalid bill request : /v1/bill/{id}");
         stopWatch.stop();
-        statsDClient.recordExecutionTime("timer.v1.bills.id.api.put",stopWatch.getLastTaskTimeMillis());
+        statsDClient.recordExecutionTime("timer.v1.bill.id.api.put",stopWatch.getLastTaskTimeMillis());
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 }
