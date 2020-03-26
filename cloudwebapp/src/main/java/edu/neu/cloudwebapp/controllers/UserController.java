@@ -13,6 +13,10 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.gson.JsonObject;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @CrossOrigin
@@ -28,6 +32,25 @@ public class UserController {
 
     @Autowired
     private StatsDClient statsDClient;
+
+
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public String GetUser(HttpServletRequest request, HttpServletResponse response) {
+        statsDClient.incrementCounter("endpoint.api.get");
+
+        JsonObject jsonObject = new JsonObject();
+        try {
+            jsonObject.addProperty("message", "Server is up & running. current time is " + java.time.LocalTime.now().toString());
+            response.setStatus(HttpServletResponse.SC_OK);
+            return jsonObject.toString();
+        } catch (Exception ex) {
+            logger.info("Health Check");
+            logger.error(ex.getMessage(), ex.getStackTrace());
+            jsonObject.addProperty("error", "Exception occured! Check log");
+            return jsonObject.toString();
+        }
+    }
 
     @RequestMapping(value = "/v1/user", method = RequestMethod.POST, produces = "application/json",
             consumes = "application/json")
