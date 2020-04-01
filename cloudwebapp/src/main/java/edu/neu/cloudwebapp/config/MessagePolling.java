@@ -19,15 +19,8 @@ public class MessagePolling {
     @Autowired
     private AWSSQS awssqs;
 
-//    @Scheduled(fixedRate = 10000)
-//    public void pollMessage() {
-//        System.out.println("Hello");
-//    }
-
     @Scheduled(fixedRate = 10000)
     public void pollMessage() {
-        String message = awssqs.receiveSQSMessage();
-        if(!message.isEmpty() && message!=null)
-            awssns.publishSNSMessage(message);
+        awssqs.receiveSQSMessage();
     }
 }

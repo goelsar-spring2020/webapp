@@ -211,7 +211,7 @@ public class BillController {
             }
             if (list.size() > 0) {
                 if(!profile.equalsIgnoreCase("local")){
-                    awssqs.sendSQSMessage(list);
+                    awssqs.sendSQSMessage(list,email);
                 }
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             } else {
