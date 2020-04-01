@@ -5,10 +5,12 @@ import edu.neu.cloudwebapp.model.PaymentStatus;
 import edu.neu.cloudwebapp.model.UserRegistration;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -156,5 +158,10 @@ public class UtilityClass {
             sb.append(Integer.toHexString((int) (b & 0xff)));
         }
         return sb.toString();
+    }
+
+    @Scheduled(fixedRate=10000)
+    public void sample(){
+        System.out.println("Hello");
     }
 }
