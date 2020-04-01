@@ -42,10 +42,10 @@ public final class AWSSQS {
 
     public void sendSQSMessage(List<BillDetails> list, String email) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(email+";");
+        stringBuilder.append(email+",");
         for (BillDetails bd : list) {
             String message = "http://" + domainName + "/v1/bill/" + bd.getId();
-            stringBuilder.append(message+";");
+            stringBuilder.append(message+",");
         }
         String resultantString = stringBuilder.toString().substring(0, stringBuilder.length()-1);
         logger.info("Sending Message to SQS" + resultantString);
