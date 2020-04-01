@@ -60,7 +60,7 @@ public class FileController {
                             return fileAttachment;
                         }
                     } else {
-                        String message = "A File Attachment already exists";
+                        String message = "AWSSNS File Attachment already exists";
                         logger.error("Post File Request - File attachment already exists : /v1/bill/{id}/file");
                         stopWatch.stop();
                         statsDClient.recordExecutionTime("timer.v1.bill.id.file.api.post",stopWatch.getLastTaskTimeMillis());
