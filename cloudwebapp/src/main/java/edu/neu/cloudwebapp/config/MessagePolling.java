@@ -21,8 +21,6 @@ public class MessagePolling {
 
     @Scheduled(fixedRate = 10000)
     public void pollMessage() {
-        String message = awssqs.receiveSQSMessage();
-        if(!message.isEmpty() && message!=null)
-            awssns.publishSNSMessage(message);
+        awssqs.receiveSQSMessage();
     }
 }
