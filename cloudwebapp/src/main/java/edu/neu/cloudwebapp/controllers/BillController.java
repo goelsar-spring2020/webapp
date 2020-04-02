@@ -16,8 +16,6 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -198,32 +196,13 @@ public class BillController {
         String email = headerAuth[0];
         String password = headerAuth[1];
         List<BillDetails> listEntity = billWebService.getUserBillDetails(email);
-        List<BillDetails> list = new ArrayList<>();
         if (listEntity.size() > 0) {
-            logger.debug("HTTP : 200 OK");
-            for (BillDetails bd : listEntity) {
-                Date d1 = new Date();
-                Date d2 = bd.getDue_date();
-                long noOfDaysBetween = (d1.getTime() - d2.getTime()) / 86400000;
-                if (Math.abs(noOfDaysBetween) <= Long.valueOf(noOfdays)) {
-                    list.add(bd);
-                }
+            if (!profile.equalsIgnoreCase("local")) {
+                awssqs.sendSQSMessage(email, noOfdays);
             }
-            if (list.size() > 0) {
-                if(!profile.equalsIgnoreCase("local")){
-                    awssqs.sendSQSMessage(list,email);
-                }
-                return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-            } else {
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         } else {
-            // No Bills Found
-            String message = "No Bill Found for this User";
-            logger.info("Get Due BILL Request - No bills Found : /v1/bills/due/{x}");
-            stopWatch.stop();
-            statsDClient.recordExecutionTime("timer.v1.bills.due.x.api.get", stopWatch.getLastTaskTimeMillis());
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 }
