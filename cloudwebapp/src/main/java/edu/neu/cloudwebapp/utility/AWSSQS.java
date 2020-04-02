@@ -66,10 +66,10 @@ public final class AWSSQS {
             for (Message messageObject : messages) {
                 message = messageObject.getBody();
                 if (!message.isEmpty() && message != null) {
+                    logger.info("Retrieved Message from SQS" + message);
                     String finalMessage = this.computeMessage(message);
                     if (finalMessage != null && !finalMessage.isEmpty()) {
-                        logger.info("Retrieved Message from SQS" + message);
-                        String result = awssns.publishSNSMessage(message);
+                        String result = awssns.publishSNSMessage(finalMessage);
                         deleteMessage(messageObject);
                     }
                 }
