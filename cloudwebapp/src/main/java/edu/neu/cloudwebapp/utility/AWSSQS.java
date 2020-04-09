@@ -102,7 +102,7 @@ public final class AWSSQS {
             long noOfDaysBetween = (d1.getTime() - d2.getTime()) / 86400000;
             if (Math.abs(noOfDaysBetween) <= Long.valueOf(dueDays)) {
                 count++;
-                String res = "http://" + domainName + "/v1/bill/" + bd.getId();
+                String res = "https://" + domainName + "/v1/bill/" + bd.getId();
                 stringBuilder.append(res + ",");
             }
         }
